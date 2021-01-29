@@ -1,0 +1,25 @@
+start[
+	int x;
+	int y = 1;
+	int 5xuxa;
+	int xaxa90;
+
+	read xaxa90;	
+	
+	x=5;
+	while(x>y)[
+		y+1;
+	]
+	if(x<y)[
+		x+5;
+	]ifno[
+		y = (x+555)*y;
+	]
+	
+	y = x -2;
+	x = 9/2;
+
+	write x;
+	&;
+
+]end
