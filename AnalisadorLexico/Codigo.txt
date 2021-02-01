@@ -2,7 +2,8 @@ start[
 	int x;
 	int y = 1;
 	int 5xuxa;
-	int xaxa90;
+	int Xaxa90;
+	int cAio;
 
 	read xaxa90;	
 	

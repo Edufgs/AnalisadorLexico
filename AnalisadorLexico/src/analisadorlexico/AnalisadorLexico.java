@@ -1,15 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package analisadorlexico;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static java.lang.System.exit;
+import java.util.Scanner;
 
 /**
  *
@@ -17,19 +15,35 @@ import java.io.InputStreamReader;
  */
 public class AnalisadorLexico {
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         int coluna; //Marca a posição no vetor
-        int l = 0;
-        char linhaChar[]; //vai guardar as linha em char
+        int l = 0;//marca a linha
+        char linhaChar[]; //vai guardar as linha em vetor de char
+        
+        //Terminal para digitar o comando do compilador
+        System.out.println("Terminal:");
+        Scanner scann = new Scanner(System.in);
+        String comando = scann.nextLine();
+        String comandoVetor[] = comando.split(" "); //separa o comando digitado em palavras no vetor
+        System.out.println("");
+        
+        if(comandoVetor[0].equals("compilador") == false){
+            System.out.println("Comando não é reconhecido!!!");
+            exit(0);
+        }
         
         try{//Tratamento de Erro
-            FileInputStream entrada = new FileInputStream("E:\\Eduardo\\Eduardo\\Semestres\\6 Semestre\\Compiladores\\Projetos\\AnalisadorLexico\\Codigo.txt"); //abre o arquivo
-            InputStreamReader tabela = new InputStreamReader(entrada);//abre para leituda do arquivo (ele lê bytes e os decodifica em caracteres usando um especificado charset)
-            BufferedReader lerTabela = new BufferedReader(tabela);//Lê texto de um fluxo de entrada de caracteres, armazenando caracteres em buffer para fornecer uma leitura eficiente de caracteres, matrizes e linhas
+            FileInputStream entrada = new FileInputStream("E:\\Eduardo\\Eduardo\\Semestres\\6 Semestre\\Compiladores\\Projetos\\AnalisadorLexico\\" + comandoVetor[comandoVetor.length -1]); //abre o arquivo
+            InputStreamReader codigo = new InputStreamReader(entrada);//abre para leituda do arquivo (ele lê bytes e os decodifica em caracteres usando um especificado charset)
+            BufferedReader lerCodigo = new BufferedReader(codigo);//Lê texto de um fluxo de entrada de caracteres, armazenando caracteres em buffer para fornecer uma leitura eficiente de caracteres, matrizes e linhas
             
-            String linha = lerTabela.readLine(); //pega a primeira linha
-            System.out.println("Tokens \t\t\t Lexemas \t\t\t Posição");
-           
+            //abrindo arquivo para ser gravado a tabela            
+            FileWriter tabela = new FileWriter("E:\\\\Eduardo\\\\Eduardo\\\\Semestres\\\\6 Semestre\\\\Compiladores\\\\Projetos\\\\AnalisadorLexico\\\\Tabela.txt");
+            tabela.write("Tokens \t\t\t Lexemas \t\t\t Posição ");
+            
+            //le o codigo digitado
+            String linha = lerCodigo.readLine(); //pega a primeira linha
+                
             while(linha != null){ //Enquanto houver linha no arquivo
                 coluna = 0;
                 linha += ' ';
@@ -37,135 +51,159 @@ public class AnalisadorLexico {
                 
                 linhaChar = linha.toCharArray(); //Transforma a String em vetor de char
                 
-                q0(linhaChar,coluna,l,lexema); //Começa na posição zero
+                q0(linhaChar,coluna,l,lexema,tabela); //Começa na posição zero
    
-                linha = lerTabela.readLine(); //pega a proxima linha
+                linha = lerCodigo.readLine(); //pega a proxima linha
                 l++;
                 
             }
             
             entrada.close();
+            tabela.close();
+            System.out.println("");
+            
+            if(comandoVetor[1].equals("-lt")==true){
+                FileInputStream abreTabela = new FileInputStream("E:\\\\Eduardo\\\\Eduardo\\\\Semestres\\\\6 Semestre\\\\Compiladores\\\\Projetos\\\\AnalisadorLexico\\\\Tabela.txt"); //abre o arquivo
+                InputStreamReader tabelab = new InputStreamReader(abreTabela);//abre para leituda do arquivo (ele lê bytes e os decodifica em caracteres usando um especificado charset)
+                BufferedReader lerTabela = new BufferedReader(tabelab);//Lê texto de um fluxo de entrada de caracteres, armazenando caracteres em buffer para fornecer uma leitura eficiente de caracteres, matrizes e linhas
+       
+                linha = lerTabela.readLine();
+                while(linha != null){
+                    System.out.println(linha);
+                    linha = lerTabela.readLine();
+                }
+                abreTabela.close();
+            }
+            
         }catch(FileNotFoundException e){
             System.out.println("Erro em abrir o arquivo");
+        }catch(IOException e){
+            System.out.println("Erro ao escrever no arquivo");
         }
     }
     
     //Estado inicial
-    public static void q0(char[] vetor, int coluna, int l, String lexema){
+    public static void q0(char[] vetor, int coluna, int l, String lexema, FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 's':
                 lexema += 's'; 
                 coluna++;
-                q1(vetor,coluna,l,lexema);
+                q1(vetor,coluna,l,lexema,tabela);
                 break;
             case 'e':
                 lexema += 'e'; 
                 coluna++;
-                q6(vetor,coluna,l,lexema);
+                q6(vetor,coluna,l,lexema, tabela);
                 break;
             case 'r':
                 lexema += 'r'; 
                 coluna++;
-                q14(vetor,coluna,l,lexema);
+                q14(vetor,coluna,l,lexema, tabela);
                 break;
             case 'w':
                 lexema += 'w'; 
                 coluna++;
-                q18(vetor,coluna,l,lexema);
+                q18(vetor,coluna,l,lexema, tabela);
                 break;
             case 'i':
                 lexema += 'i'; 
                 coluna++;
-                q23(vetor,coluna,l,lexema);               
+                q23(vetor,coluna,l,lexema, tabela);               
                 break;
             case '/':
                 lexema += '/'; 
                 coluna++;
-                q36(vetor,coluna,l,lexema);  
+                q36(vetor,coluna,l,lexema, tabela);  
                 break;
             case '*':
                 lexema += '*'; 
                 coluna++;
-                q35(vetor,coluna,l,lexema);  
+                q35(vetor,coluna,l,lexema, tabela);  
                 break;
             case '-':
                 lexema += '-'; 
                 coluna++;
-                q34(vetor,coluna,l,lexema);
+                q34(vetor,coluna,l,lexema, tabela);
                 break;
             case '+':
                 lexema += '+'; 
                 coluna++;
-                q33(vetor,coluna,l,lexema);
+                q33(vetor,coluna,l,lexema, tabela);
                 break;
             case ';':
                 lexema += ';'; 
                 coluna++;
-                q13(vetor,coluna,l,lexema);
+                q13(vetor,coluna,l,lexema, tabela);
                 break;
             case ')':
                 lexema += ')'; 
                 coluna++;
-                q12(vetor,coluna,l,lexema);
+                q12(vetor,coluna,l,lexema, tabela);
                 break;
             case '(':
                 lexema += '('; 
                 coluna++;
-                q11(vetor,coluna,l,lexema);
+                q11(vetor,coluna,l,lexema, tabela);
                 break;
             case ']':
                 lexema += ']'; 
                 coluna++;
-                q10(vetor,coluna,l,lexema);
+                q10(vetor,coluna,l,lexema, tabela);
                 break;
             case '[':
                 lexema += '['; 
                 coluna++;
-                q9(vetor,coluna,l,lexema);
+                q9(vetor,coluna,l,lexema, tabela);
                 break;
             case '>':
                 lexema += '>'; 
                 coluna++;
-                q37(vetor,coluna,l,lexema);
+                q37(vetor,coluna,l,lexema, tabela);
                 break;
             case '<':
                 lexema += '<'; 
                 coluna++;
-                q38(vetor,coluna,l,lexema);
+                q38(vetor,coluna,l,lexema, tabela);
                 break;
             case '=':
                 lexema += '='; 
                 coluna++;
-                q39(vetor,coluna,l,lexema);
+                q39(vetor,coluna,l,lexema, tabela);
                 break;
             case ' ':
                 if(coluna + 1 != vetor.length){
                     coluna++;
-                    q0(vetor,coluna,l,lexema);
+                    q0(vetor,coluna,l,lexema, tabela);
                 }
                 break;
             case '\t'://reconhecer tabulação
                 coluna++;
-                q0(vetor,coluna,l,lexema);
+                q0(vetor,coluna,l,lexema, tabela);
                 break;
             default:
                 switch(verifChar(vetor,coluna)){
                     case 1: 
                         lexema += vetor[coluna];
                         coluna++;
-                        q40(vetor, coluna,l,lexema);
+                        q40(vetor, coluna,l,lexema, tabela);
                         break;
                     case 2:
-                        q41(vetor,coluna,l,lexema);
+                        q41(vetor,coluna,l,lexema, tabela);
                         break;
                     case 3:
+                        //imprime na tela
                         System.out.print("Erro Lexico \t\t ");
                         System.out.print("Caractere não esperado: " + vetor[coluna]);
                         System.out.print("\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
                         System.out.println("");
+                        
+                        //imprimir no arquivo
+                        tabela.write("\nErro Lexico \t\t ");
+                        tabela.write("Caractere não esperado: " + vetor[coluna]);
+                        tabela.write("\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
                         lexema="";
                         coluna++;
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema, tabela);
                     break;
                     default:
                         System.out.println("Erro q0");
@@ -185,75 +223,75 @@ public class AnalisadorLexico {
     }
     
     //estado do comando start (t)
-    public static void q1(char[] vetor, int coluna, int l, String lexema){
+    public static void q1(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
          switch(vetor[coluna]){
             case 't':
                 lexema+= 't';
                 coluna++;
-                q2(vetor,coluna,l,lexema);
+                q2(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando start (a)
-    public static void q2(char[] vetor, int coluna, int l, String lexema){
+    public static void q2(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
          switch(vetor[coluna]){
             case 'a':
                 lexema+= 'a';
                 coluna++;
-                q3(vetor,coluna,l,lexema);
+                q3(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando start (r)
-    public static void q3(char[] vetor, int coluna, int l, String lexema){
+    public static void q3(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
          switch(vetor[coluna]){
             case 'r':
                 lexema+= 'r';
                 coluna++;
-                q4(vetor,coluna,l,lexema);
+                q4(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando start (t)
-    public static void q4(char[] vetor, int coluna, int l, String lexema){
+    public static void q4(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
          switch(vetor[coluna]){
             case 't':
                 lexema+= 't';
                 coluna++;
-                q5(vetor, coluna,l,lexema);
+                q5(vetor, coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado final do comando start. Onde imprime na tela e verifica se é o comando "start"
-    public static void q5(char[] vetor, int coluna, int l, String lexema){
+    public static void q5(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 5://verifica se é o tokens start ou um id com final start
-                        System.out.print("tk_inicio \t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_inicio \t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -262,49 +300,49 @@ public class AnalisadorLexico {
     }
     
      //estado do comando end (n)
-    public static void q6(char[] vetor, int coluna, int l, String lexema){
+    public static void q6(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'n':
                 lexema+= 'n';
                 coluna++;
-                q7(vetor,coluna,l,lexema);
+                q7(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
    
     //estado do comando end (d)
-    public static void q7(char[] vetor, int coluna, int l, String lexema){
+    public static void q7(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'd':
                 lexema+= 'd';
                 coluna++;
-                q8(vetor,coluna,l,lexema);
+                q8(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
    
     //estado final do comando end. Onde imprime na tela e verifica se é o comando "end"
-    public static void q8(char[] vetor, int coluna, int l, String lexema){
+    public static void q8(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 3://verifica se é o tokens end ou um id com final end
-                        System.out.print("tk_fim \t\t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length()));
-                        System.out.println("");
+                        tabela.write("\ntk_fim \t\t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length()));
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -313,112 +351,107 @@ public class AnalisadorLexico {
     }
     
      //estado final do comando [
-    public static void q9(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_abre_co \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q9(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_abre_co \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);   
+        q0(vetor,coluna,l,lexema,tabela);   
     }
     
      //estado final do comando ]
-    public static void q10(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_fecha_co \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q10(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_fecha_co \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);         
+        q0(vetor,coluna,l,lexema,tabela);         
     }
     
      //estado final do comando (
-    public static void q11(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_abre_pa \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q11(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_abre_pa \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);        
+        q0(vetor,coluna,l,lexema,tabela);        
     }
     
      //estado final do comando )
-    public static void q12(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_fecha_pa \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q12(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_fecha_pa \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);      
+        q0(vetor,coluna,l,lexema,tabela);      
     }
     
     //estado final do comando ;
-    public static void q13(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_ponto_virgula \t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q13(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_ponto_virgula \t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);          
+        q0(vetor,coluna,l,lexema,tabela);          
     }
     
     //estado do comando read (e)
-    public static void q14(char[] vetor, int coluna, int l, String lexema){
+    public static void q14(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'e':
                 lexema+= 'e';
                 coluna++;
-                q15(vetor,coluna,l,lexema);
+                q15(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando read (a)
-    public static void q15(char[] vetor, int coluna, int l, String lexema){
+    public static void q15(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'a':
                 lexema+= 'a';
                 coluna++;
-                q16(vetor,coluna,l,lexema);
+                q16(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando read (d)
-    public static void q16(char[] vetor, int coluna, int l, String lexema){
+    public static void q16(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'd':
                 lexema+= 'd';
                 coluna++;
-                q17(vetor,coluna,l,lexema);
+                q17(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado final do comando read. Onde imprime na tela e verifica se é o comando "read"
-    public static void q17(char[] vetor, int coluna, int l, String lexema){
+    public static void q17(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 4://verifica se é o tokens read ou um id com final read
-                        System.out.print("tk_ler \t\t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_ler \t\t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -427,80 +460,80 @@ public class AnalisadorLexico {
     }
     
     //estado do comando write (r)
-    public static void q18(char[] vetor, int coluna, int l, String lexema){
+    public static void q18(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'r':
                 lexema+= 'r';
                 coluna++;
-                q19(vetor,coluna,l,lexema);
+                q19(vetor,coluna,l,lexema,tabela);
                 break;
             case 'h':
                 lexema+= 'h';
                 coluna++;
-                q29(vetor,coluna,l,lexema);
+                q29(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando write (i)
-    public static void q19(char[] vetor, int coluna, int l, String lexema){
+    public static void q19(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'i':
                 lexema+= 'i';
                 coluna++;
-                q20(vetor,coluna,l,lexema);
+                q20(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando write (t)
-    public static void q20(char[] vetor, int coluna, int l, String lexema){
+    public static void q20(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 't':
                 lexema+= 't';
                 coluna++;
-                q21(vetor,coluna,l,lexema);
+                q21(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando write (e)
-    public static void q21(char[] vetor, int coluna, int l, String lexema){
+    public static void q21(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'e':
                 lexema+= 'e';
                 coluna++;
-                q22(vetor,coluna,l,lexema);
+                q22(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado final do comando write. Onde imprime na tela e verifica se é o comando "write"
-    public static void q22(char[] vetor, int coluna, int l, String lexema){
+    public static void q22(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 5://verifica se é o tokens write ou um id com final write
-                        System.out.print("tk_escreve \t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_escreve \t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -509,54 +542,54 @@ public class AnalisadorLexico {
     }
     
      //estado do comando int, ou if e ifno
-    public static void q23(char[] vetor, int coluna, int l, String lexema){
+    public static void q23(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'n':
                 lexema+= 'n';
                 coluna++;
-                q24(vetor,coluna,l,lexema);
+                q24(vetor,coluna,l,lexema,tabela);
                 break;
             case 'f':
                 lexema+= 'f';
                 coluna++;
-                q26(vetor,coluna,l,lexema);
+                q26(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado do comando int (t)
-    public static void q24(char[] vetor, int coluna, int l, String lexema){
+    public static void q24(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 't':
                 lexema+= 't';
                 coluna++;
-                q25(vetor,coluna,l,lexema);
+                q25(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
      //estado final do comando int. Onde imprime na tela e verifica se é o comando "int"
-    public static void q25(char[] vetor, int coluna, int l, String lexema){
+    public static void q25(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 3://verifica se é o tokens int ou um id com final int
-                        System.out.print("tk_int \t\t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_int \t\t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -564,31 +597,31 @@ public class AnalisadorLexico {
         }
     }
     //estado final do comando if. Onde imprime na tela e verifica se é o comando "if"
-    public static void q26(char[] vetor, int coluna, int l, String lexema){
+    public static void q26(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
                 switch(vetor[coluna]){//verifica se é o ifno
                     case 'n':
                         lexema+= 'n';
                         coluna++;
-                        q27(vetor,coluna,l,lexema);
+                        q27(vetor,coluna,l,lexema,tabela);
                         break;
                     default:
-                        q0(vetor, coluna,l,lexema);
+                        q0(vetor, coluna,l,lexema,tabela);
                 }
                 break;
             case 3:
                 switch(lexema.length()){
                     case 2://verifica se é o tokens if ou um id com final if
-                        System.out.print("tk_se \t\t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_se \t\t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -597,36 +630,36 @@ public class AnalisadorLexico {
     }
     
      //estado do comando ifno (o)
-    public static void q27(char[] vetor, int coluna, int l, String lexema){
+    public static void q27(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'o':
                 lexema+= 'o';
                 coluna++;
-                q28(vetor,coluna,l,lexema);
+                q28(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
     //estado final do comando ifno. Onde imprime na tela e verifica se é o comando "ifno"
-    public static void q28(char[] vetor, int coluna, int l, String lexema){
+    public static void q28(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 4://verifica se é o tokens ifno ou um id com final ifno
-                        System.out.print("tk_senao \t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_senao \t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -634,62 +667,62 @@ public class AnalisadorLexico {
         }
     }
      //estado do comando while (i)
-    public static void q29(char[] vetor, int coluna, int l, String lexema){
+    public static void q29(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'i':
                 lexema+= 'i';
                 coluna++;
-                q30(vetor,coluna,l,lexema);
+                q30(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
      //estado do comando while  (l)
-    public static void q30(char[] vetor, int coluna, int l, String lexema){
+    public static void q30(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'l':
                 lexema+= 'l';
                 coluna++;
-                q31(vetor,coluna,l,lexema);
+                q31(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
      //estado do comando while  (e)
-    public static void q31(char[] vetor, int coluna, int l, String lexema){
+    public static void q31(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
             case 'e':
                 lexema+= 'e';
                 coluna++;
-                q32(vetor,coluna,l,lexema);
+                q32(vetor,coluna,l,lexema,tabela);
                 break;
             default:
-                q41(vetor,coluna,l,lexema);
+                q41(vetor,coluna,l,lexema,tabela);
         }
     }
     
      //estado final do comando while. Onde imprime na tela e verifica se é o comando "while"
-    public static void q32(char[] vetor, int coluna, int l, String lexema){
+    public static void q32(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
-                q0(vetor, coluna,l,lexema);
+                q0(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
                 switch(lexema.length()){
                     case 5://verifica se é o tokens write ou um id com final write
-                        System.out.print("tk_enquanto \t\t ");
-                        System.out.print(lexema);
-                        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                        System.out.println("");
+                        tabela.write("\ntk_enquanto \t\t ");
+                        tabela.write(lexema);
+                        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+       
                         lexema = "";
-                        q0(vetor,coluna,l,lexema);
+                        q0(vetor,coluna,l,lexema,tabela);
                     break;
                     default:
-                     q41(vetor,coluna,l,lexema);
+                     q41(vetor,coluna,l,lexema,tabela);
                 }
                 break;
             default:
@@ -698,93 +731,90 @@ public class AnalisadorLexico {
     }
     
     //estado final do comando +
-    public static void q33(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_adicao \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q33(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_adicao \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);             
+        q0(vetor,coluna,l,lexema,tabela);             
     }
     //estado final do comando -
-    public static void q34(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_subtracao \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q34(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_subtracao \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);          
+        q0(vetor,coluna,l,lexema,tabela);          
     }
     
     //estado final do comando *
-    public static void q35(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_multiplicacao \t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q35(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_multiplicacao \t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);        
+        q0(vetor,coluna,l,lexema,tabela);        
     }
     
     //estado final do comando /
-    public static void q36(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_divisão \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q36(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_divisão \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);            
+        q0(vetor,coluna,l,lexema,tabela);            
     }
     
     //estado final do comando >
-    public static void q37(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_maior \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q37(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_maior \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);             
+        q0(vetor,coluna,l,lexema,tabela);             
     }
     
       //estado final do comando <
-    public static void q38(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_menor \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q38(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_menor \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);         
+        q0(vetor,coluna,l,lexema,tabela);         
     }
     
       //estado final do comando =
-    public static void q39(char[] vetor, int coluna, int l, String lexema){       
-        System.out.print("tk_atribuicao \t\t ");
-        System.out.print(lexema);
-        System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-        System.out.println("");
+    public static void q39(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{       
+        tabela.write("\ntk_atribuicao \t\t ");
+        tabela.write(lexema);
+        tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da
         lexema = "";
-        q0(vetor,coluna,l,lexema);
+        q0(vetor,coluna,l,lexema,tabela);
                     
     }
     
      //estado do num. Verifica se é um num e imprime na tela
-    public static void q40(char[] vetor, int coluna, int l, String lexema){
+    public static void q40(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: 
                 lexema += vetor[coluna];
                 coluna++;
-                q40(vetor, coluna,l,lexema);
+                q40(vetor, coluna,l,lexema,tabela);
                 break;
             case 2:
-                System.out.println("Erro: Id não pode começar com numero!!!!");
+                //imprime na tela
+                System.out.print("Erro: Id não pode começar com numero!!!!");
+                System.out.println("\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+                //imprime na tabela
+                tabela.write("\nErro: Id não pode começar com numero!!!!");
+                tabela.write("\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
                 break;
             case 3:
-                System.out.print("num \t\t\t ");
-                    System.out.print(lexema);
-                    System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                    System.out.println("");
-                    lexema="";
-                    q0(vetor,coluna,l,lexema);
+                tabela.write("\nnum \t\t\t ");
+                tabela.write(lexema);
+                tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+                lexema="";
+                q0(vetor,coluna,l,lexema,tabela);
                 break;
             default:
                 System.out.println("Erro q40");
@@ -792,20 +822,19 @@ public class AnalisadorLexico {
     }  
    
     //estado do id. Verifica se é um id e imprime na tela
-    public static void q41(char[] vetor, int coluna, int l, String lexema){
+    public static void q41(char[] vetor, int coluna, int l, String lexema,FileWriter tabela) throws IOException{
         switch(verifChar(vetor,coluna)){
             case 1: case 2:
                 lexema += vetor[coluna];
                 coluna++;
-                q41(vetor, coluna,l,lexema);
+                q41(vetor, coluna,l,lexema,tabela);
                 break;
             case 3:
-                System.out.print("id \t\t\t ");
-                    System.out.print(lexema);
-                    System.out.print("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
-                    System.out.println("");
-                    lexema="";
-                    q0(vetor,coluna,l,lexema);
+                tabela.write("\nid \t\t\t ");
+                tabela.write(lexema);
+                tabela.write("\t\t\t\t Linha " + l + " Coluna " + (coluna - lexema.length())); //diminui o tanto de caractere para mostar o começo da palavra
+                lexema="";
+                q0(vetor,coluna,l,lexema,tabela);
                 break;
             default:
                 System.out.println("Erro q41");
