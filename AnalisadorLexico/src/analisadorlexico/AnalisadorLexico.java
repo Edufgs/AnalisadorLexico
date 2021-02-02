@@ -24,13 +24,14 @@ public class AnalisadorLexico {
         System.out.println("Terminal:");
         Scanner scann = new Scanner(System.in);
         String comando = scann.nextLine();
-        String comandoVetor[] = comando.split(" "); //separa o comando digitado em palavras no vetor
+        String comandoVetor[] = comando.split(" ");//separa o comando digitado em palavras no vetor
         System.out.println("");
         
+        //verifica se está correto o comando
         if(comandoVetor[0].equals("compilador") == false){
             System.out.println("Comando não é reconhecido!!!");
             exit(0);
-        }
+        }    
         
         try{//Tratamento de Erro
             FileInputStream entrada = new FileInputStream("E:\\Eduardo\\Eduardo\\Semestres\\6 Semestre\\Compiladores\\Projetos\\AnalisadorLexico\\" + comandoVetor[comandoVetor.length -1]); //abre o arquivo
@@ -39,49 +40,50 @@ public class AnalisadorLexico {
             
             //abrindo arquivo para ser gravado a tabela            
             FileWriter tabela = new FileWriter("E:\\\\Eduardo\\\\Eduardo\\\\Semestres\\\\6 Semestre\\\\Compiladores\\\\Projetos\\\\AnalisadorLexico\\\\Tabela.txt");
-            tabela.write("Tokens \t\t\t Lexemas \t\t\t Posição ");
+            tabela.write("Tokens \t\t\t Lexemas \t\t\t Posição "); //grava o inicio da tabela no arquivo
             
             //le o codigo digitado
             String linha = lerCodigo.readLine(); //pega a primeira linha
                 
             while(linha != null){ //Enquanto houver linha no arquivo
-                coluna = 0;
-                linha += ' ';
-                String lexema = "";
-                
+                coluna = 0;//coluna começa no inicio
+                linha += ' ';//adiciona espaço para saber o final da linha
+                String lexema = "";//limpa a String que guarda os lexemas para imprimir na tabela
                 linhaChar = linha.toCharArray(); //Transforma a String em vetor de char
-                
                 q0(linhaChar,coluna,l,lexema,tabela); //Começa na posição zero
-   
                 linha = lerCodigo.readLine(); //pega a proxima linha
-                l++;
-                
+                l++;//vai para proxima linha
             }
             
-            entrada.close();
-            tabela.close();
+            entrada.close();//fecha o arquivo fonte
+            tabela.close();//fecha a tabela 
             System.out.println("");
             
-            if(comandoVetor[1].equals("-lt")==true){
+            //imprime a tabela se for pedida
+            tabelaToken(comandoVetor,linha);
+        }catch(FileNotFoundException e){
+            System.out.println("Erro em abrir o arquivo");
+        }catch(IOException e){
+            System.out.println("Erro:" + e);
+        }finally{
+            System.out.println("\nAnalisado com sucesso!!!\n");
+        }
+    }
+
+    public static void tabelaToken(String[] comandoVetor,String linha) throws FileNotFoundException, IOException{
+        if(comandoVetor[1].equals("-lt")==true){
                 FileInputStream abreTabela = new FileInputStream("E:\\\\Eduardo\\\\Eduardo\\\\Semestres\\\\6 Semestre\\\\Compiladores\\\\Projetos\\\\AnalisadorLexico\\\\Tabela.txt"); //abre o arquivo
                 InputStreamReader tabelab = new InputStreamReader(abreTabela);//abre para leituda do arquivo (ele lê bytes e os decodifica em caracteres usando um especificado charset)
                 BufferedReader lerTabela = new BufferedReader(tabelab);//Lê texto de um fluxo de entrada de caracteres, armazenando caracteres em buffer para fornecer uma leitura eficiente de caracteres, matrizes e linhas
        
-                linha = lerTabela.readLine();
+                linha = lerTabela.readLine();//pega a proxima linha
                 while(linha != null){
-                    System.out.println(linha);
-                    linha = lerTabela.readLine();
+                    System.out.println(linha);//imprime a linha
+                    linha = lerTabela.readLine();//pega a proxima linha
                 }
                 abreTabela.close();
             }
-            
-        }catch(FileNotFoundException e){
-            System.out.println("Erro em abrir o arquivo");
-        }catch(IOException e){
-            System.out.println("Erro ao escrever no arquivo");
-        }
     }
-    
     //Estado inicial
     public static void q0(char[] vetor, int coluna, int l, String lexema, FileWriter tabela) throws IOException{
         switch(vetor[coluna]){
